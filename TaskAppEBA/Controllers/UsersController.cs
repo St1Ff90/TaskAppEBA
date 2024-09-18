@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BL.DTO;
 using BL.Services;
+using BL.Requests;
 
 namespace TaskAppEBA.Controllers
 {
@@ -8,13 +9,13 @@ namespace TaskAppEBA.Controllers
     {
         private readonly UserService _userService;
 
-        public UsersController(UserService authService)
+        public UsersController(UserService userService)
         {
-            _userService = authService;
+            _userService = userService;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync(RegistrationDto registrationDto)
+        public async Task<IActionResult> RegisterAsync(RegistrationRequest registrationDto)
         {
             await _userService.RegisterAsync(registrationDto);
             return Ok();

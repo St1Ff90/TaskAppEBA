@@ -30,9 +30,33 @@ namespace DAL.Repositories
             return await _db.MyTasks.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<ICollection<MyTask>> GetAllAsync()
+        public IQueryable<MyTask> GetUserTasks(Guid userId, int? status, DateTime? dueDate, int? priority)
         {
-            return await _db.MyTasks.ToListAsync();
+            var tasks = _db.MyTasks.Where(x => x.UserId == userId);
+
+            if (status.HasValue)
+            {
+                tasks = tasks.Where(t => t.Status == status);
+            }
+
+            if (dueDate.HasValue)
+            {
+                tasks = tasks.Where(t => t.DueDate != null && t.DueDate.Value.Date == dueDate.Value.Date);
+            }
+
+            if (priority.HasValue)
+            {
+                tasks = tasks.Where(t => t.Priority == priority.Value);
+            }
+
+            return tasks;
+        }
+
+        public async Task<IEnumerable<MyTask>> GetAllAsync(Guid userId)
+        {
+            var sdsds = await _db.MyTasks.ToListAsync();
+
+            return sdsds;
         }
 
         public async Task<MyTask> UpdateAsync(MyTask task)

@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using BL.Options;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,11 +13,16 @@ namespace BL.Services.TokenService
 {
     public class TokenService : ITokenService
     {
-        string secretKey = "this is my custom Secret key for authentication 256-bit-secret";
+        private readonly AuthOptions _authOptions;
 
-        public string GenerateToken(string username)
+        public TokenService(IOptions<AuthOptions> authOptions)
         {
-            var signingKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(secretKey));
+            _authOptions = authOptions.Value;
+        }
+
+        public string GenerateToken(Guid userId)
+        {
+            var signingKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(_authOptions.Key!));
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -23,9 +30,9 @@ namespace BL.Services.TokenService
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim(ClaimTypes.Name, username)
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()) // ClaimTypes.NameIdentifier для айди? Может другой? 
             }),
-                Expires = DateTime.UtcNow.AddHours(1), 
+                Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = signingCredentials
             };
 

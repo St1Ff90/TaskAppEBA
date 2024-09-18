@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BL.DTO
+namespace BL.Requests
 {
-    public class RegistrationDto
+    public class RegistrationRequest
     {
         [Required]
         public string? Username { get; set; }

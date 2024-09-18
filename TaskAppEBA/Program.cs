@@ -1,13 +1,17 @@
 
-using BL.Profiles;
+using BL.Options;
 using BL.Services;
 using BL.Services.HashService;
 using BL.Services.TokenService;
 using DAL;
 using DAL.Repositories;
 using Lection2_Core_BL.Services.HashService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace TaskAppEBA
 {
@@ -22,25 +26,66 @@ namespace TaskAppEBA
                     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
             builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+            builder.Services.AddScoped(typeof(ITaskRepository), typeof(TaskRepository));
 
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<TaskService>();
+
 
             builder.Services.AddSingleton<IHashService, HashService>();
-
             builder.Services.AddSingleton<ITokenService, TokenService>();
 
+            builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection(nameof(AuthOptions)));
 
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+                        builder.Configuration.GetSection(nameof(AuthOptions))["Key"]!))
+                };
+            });
             builder.Services.AddControllers();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-
-            var assemblies = new[]
+            builder.Services.AddSwaggerGen(c =>
             {
-                typeof(UserProfile).Assembly
-            };
-            builder.Services.AddAutoMapper(assemblies);
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                    Enter 'Bearer' [space] and then your token in the text input below.
+                    \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
+    });
+            });
 
             var app = builder.Build();
 

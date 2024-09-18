@@ -13,6 +13,7 @@ namespace DAL.Repositories
         Task<MyTask> UpdateAsync(MyTask task);
         Task<bool> DeleteAsync(MyTask task);
         Task<MyTask?> GetAsync(Guid id);
-        Task<ICollection<MyTask>> GetAllAsync();
+        Task<IEnumerable<MyTask>> GetAllAsync(Guid userId);
+        IQueryable<MyTask> GetUserTasks(Guid userId, int? status, DateTime? dueDate, int? priority);
     }
 }

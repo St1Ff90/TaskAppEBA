@@ -8,6 +8,6 @@ namespace BL.Services.TokenService
 {
     public interface ITokenService
     {
-        string GenerateToken(string username);
+        string GenerateToken(Guid userId);
     }
 }

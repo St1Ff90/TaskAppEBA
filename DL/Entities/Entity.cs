@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Entities
 {
-    public abstract class Entity : IEntity<Guid>
+    public abstract class Entity
     {
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }

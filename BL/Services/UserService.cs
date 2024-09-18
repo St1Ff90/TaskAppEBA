@@ -1,6 +1,8 @@
 ﻿//using AutoMapper;
 using AutoMapper;
 using BL.DTO;
+using BL.Mappers;
+using BL.Requests;
 using BL.Services.TokenService;
 using DAL.Entities;
 using DAL.Repositories;
@@ -16,27 +18,23 @@ namespace BL.Services
     public class UserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
         private readonly IHashService _hashService;
         private readonly ITokenService _tokenService;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IHashService hashService, ITokenService tokenService)
+        public UserService(IUserRepository userRepository, IHashService hashService, ITokenService tokenService)
         {
             _userRepository = userRepository;
             _hashService = hashService;
-            _mapper = mapper;
             _hashService = hashService;
             _tokenService = tokenService;
-
         }
 
-        public async Task RegisterAsync(RegistrationDto registrationDto)
+        public async Task RegisterAsync(RegistrationRequest registrationRequest)
         {
-            var dto = _mapper.Map<User>(registrationDto);
-            var sdsd = _hashService.GetHash(registrationDto.Password!);
-            var sdsd1 = _hashService.GetHash(registrationDto.Password!);
-
-            dto.PasswordHash = _hashService.GetHash(registrationDto.Password!);
+            var dto = UserMapper.MapToUserModelRegistrationRequest(registrationRequest);
+            dto.Id = Guid.NewGuid();
+            dto.PasswordHash = _hashService.GetHash(registrationRequest.Password!);
+            dto.CreatedAt = dto.UpdatedAt = DateTime.Now;
 
             await _userRepository.CreateAsync(dto);
         }
@@ -48,7 +46,7 @@ namespace BL.Services
             {
                 if (_hashService.VerifySameHash(loginDto.Password, user.PasswordHash))
                 {
-                    return _tokenService.GenerateToken(user.Username);
+                    return _tokenService.GenerateToken(user.Id);
                 }
             }
 
