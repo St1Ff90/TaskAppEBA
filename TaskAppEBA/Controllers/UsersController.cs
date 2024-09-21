@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BL.DTO;
-using BL.Services;
-using BL.Requests;
+using BL.Models.Requests;
+using BL.Models.DTO;
+using BL.Services.UserService;
 
 namespace TaskAppEBA.Controllers
 {
+    [Route("[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UsersController(UserService userService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
         }

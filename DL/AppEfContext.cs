@@ -1,43 +1,45 @@
 ﻿using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAL
 {
     public class AppEfContext : DbContext
     {
         public DbSet<User> MyUsers { get; set; }
-        public DbSet<Entities.MyTask> MyTasks { get; set; }
+        public DbSet<UserTask> MyTasks { get; set; }
 
-        public AppEfContext(
-            DbContextOptions<AppEfContext> options
-            ) : base(options) { }
+        public AppEfContext(DbContextOptions<AppEfContext> options)
+            : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Entities.MyTask>(entity =>
+            modelBuilder.Entity<Entities.UserTask>(entity =>
             {
-                entity.Property(x => x.Title).IsRequired();
+                entity
+                    .Property(x => x.Title)
+                    .IsRequired();
 
                 entity.HasOne(x => x.User)
                     .WithMany(x => x.Tasks)
                     .HasForeignKey(x => x.UserId)
                     .OnDelete(DeleteBehavior.SetNull);
+
+                //entity.Property(x=>x.Priority).index
             });
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(x => x.Username).IsRequired();
-                entity.HasIndex(x => x.Username).IsUnique();
+                entity
+                    .Property(x => x.Username)
+                    .IsRequired();
+                entity
+                    .HasIndex(x => x.Username)
+                    .IsUnique();
 
-                entity.HasMany(x => x.Tasks)
-                .WithOne(x => x.User);
+                entity
+                    .HasMany(x => x.Tasks)
+                    .WithOne(x => x.User);
             });
-
         }
     }
 }

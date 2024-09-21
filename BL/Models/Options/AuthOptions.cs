@@ -1,4 +1,4 @@
-﻿namespace BL.Options;
+﻿namespace BL.Models.Options;
 
 public class AuthOptions
 {

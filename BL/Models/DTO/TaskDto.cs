@@ -1,15 +1,10 @@
 ﻿using DAL.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static DAL.Entities.MyTask;
 
-namespace BL.DTO
+namespace BL.Models.DTO
 {
     public class TaskDto
     {
+        public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateTime? DueDate { get; set; }

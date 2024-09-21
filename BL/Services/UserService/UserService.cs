@@ -1,21 +1,13 @@
-﻿//using AutoMapper;
-using AutoMapper;
-using BL.DTO;
-using BL.Mappers;
-using BL.Requests;
+﻿using BL.Mappers;
+using BL.Models.DTO;
+using BL.Models.Requests;
 using BL.Services.TokenService;
-using DAL.Entities;
-using DAL.Repositories;
+using DAL.Repositories.UserRepository.UserRepository;
 using Lection2_Core_BL.Services.HashService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BL.Services
+namespace BL.Services.UserService
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IHashService _hashService;
@@ -25,24 +17,25 @@ namespace BL.Services
         {
             _userRepository = userRepository;
             _hashService = hashService;
-            _hashService = hashService;
             _tokenService = tokenService;
         }
 
         public async Task RegisterAsync(RegistrationRequest registrationRequest)
         {
-            var dto = UserMapper.MapToUserModelRegistrationRequest(registrationRequest);
-            dto.Id = Guid.NewGuid();
-            dto.PasswordHash = _hashService.GetHash(registrationRequest.Password!);
-            dto.CreatedAt = dto.UpdatedAt = DateTime.Now;
+            var user = UserMapper.MapToUserModelRegistrationRequest(registrationRequest);
+            user.Id = Guid.NewGuid();
+            user.PasswordHash = _hashService.GetHash(registrationRequest.Password!);
+            var currentDate = DateTime.UtcNow.Date;
+            user.CreatedAt = currentDate;
+            user.UpdatedAt = currentDate;
 
-            await _userRepository.CreateAsync(dto);
+            await _userRepository.CreateAsync(user);
         }
 
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
             var user = await _userRepository.GetByEmailAsync(loginDto.Email!);
-            if (!String.IsNullOrEmpty(loginDto.Password) && user != null)
+            if (!string.IsNullOrEmpty(loginDto.Password) && user != null)
             {
                 if (_hashService.VerifySameHash(loginDto.Password, user.PasswordHash))
                 {
@@ -50,7 +43,7 @@ namespace BL.Services
                 }
             }
 
-            return string.Empty;
+            return string.Empty; //Проверить
         }
     }
 }

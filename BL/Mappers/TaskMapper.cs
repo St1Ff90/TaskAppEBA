@@ -1,20 +1,18 @@
-﻿using BL.DTO;
-using BL.Requests;
+﻿using BL.Models.DTO;
+using BL.Models.Requests;
 using DAL.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BL.Mappers
 {
     public static class TaskMapper
     {
-        public static TaskDto MapModelToTaskDto(MyTask task)
+        public static TaskDto? MapModelToTaskDto(UserTask? task)
         {
-            return new TaskDto()
+            if (task == null) return null;
+
+            return new TaskDto
             {
+                Id = task.Id,
                 CreatedAt = task.CreatedAt,
                 Description = task.Description,
                 DueDate = task.DueDate,
@@ -22,6 +20,18 @@ namespace BL.Mappers
                 Status = (Status)task.Status!,
                 Title = task.Title,
                 UpdatedAt = task.UpdatedAt
+            };
+        }
+
+        public static UserTask MapToTaskModel(UserTaskRequest request)
+        {
+            return new UserTask
+            {
+                Title = request.Title,
+                Description = request.Description,
+                DueDate = request.DueDate,
+                Priority = (int)request.Priority,
+                Status = (int)request.Status
             };
         }
     }

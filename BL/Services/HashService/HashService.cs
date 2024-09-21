@@ -1,19 +1,14 @@
 ﻿using Lection2_Core_BL.Services.HashService;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BCrypt.Net;
 
 namespace BL.Services.HashService
 {
     public class HashService : IHashService
     {
+        private const int workFactor = 12;
+
         public string GetHash(string password)
         {
-            return BCrypt.Net.BCrypt.EnhancedHashPassword(password, 12);
+            return BCrypt.Net.BCrypt.EnhancedHashPassword(password, workFactor);
         }
 
         public bool VerifySameHash(string password, string hash)

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL.Entities
+namespace Core.Models
 {
-    public interface IEntity<TId>
+    public enum SortField
     {
-        TId Id { get; set; }
+        DueDate, Priority, Status, Title
     }
 }

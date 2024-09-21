@@ -1,6 +1,0 @@
-@TaskAppEBA_HostAddress = http://localhost:5146
-
-GET {{TaskAppEBA_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
