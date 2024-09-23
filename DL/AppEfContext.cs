@@ -6,7 +6,7 @@ namespace DAL
     public class AppEfContext : DbContext
     {
         public DbSet<User> MyUsers { get; set; }
-        public DbSet<UserTask> MyTasks { get; set; }
+        public DbSet<UserTask> UserTasks { get; set; }
 
         public AppEfContext(DbContextOptions<AppEfContext> options)
             : base(options) { }
@@ -19,12 +19,14 @@ namespace DAL
                     .Property(x => x.Title)
                     .IsRequired();
 
+                entity.HasIndex(x => x.Status);
+                entity.HasIndex(x => x.DueDate);
+                entity.HasIndex(x => x.Priority);
+
                 entity.HasOne(x => x.User)
                     .WithMany(x => x.Tasks)
                     .HasForeignKey(x => x.UserId)
                     .OnDelete(DeleteBehavior.SetNull);
-
-                //entity.Property(x=>x.Priority).index
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -32,6 +34,7 @@ namespace DAL
                 entity
                     .Property(x => x.Username)
                     .IsRequired();
+
                 entity
                     .HasIndex(x => x.Username)
                     .IsUnique();

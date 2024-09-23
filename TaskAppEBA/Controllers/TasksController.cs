@@ -1,4 +1,5 @@
-﻿using BL.Models.Filters;
+﻿using BL.Models.DTO;
+using BL.Models.Filters;
 using BL.Models.Requests;
 using BL.Services.TaskService;
 using DAL.Entities;
@@ -14,69 +15,142 @@ namespace TaskAppEBA.Controllers
     {
         private readonly Func<Guid> GetUserIdFromClaims;
         private readonly ITaskService _taskService;
+        private readonly ILogger<TasksController> _logger;
 
-        public TasksController(ITaskService taskService)
+        public TasksController(ITaskService taskService, ILogger<TasksController> logger)
         {
             _taskService = taskService;
             GetUserIdFromClaims = GetUserId;
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetTaskByIdAsync(Guid id) //Task<IActionResult> vs Task<ActionResult<UserTask>>
-        {
-            var task = await _taskService.GetUserTaskByIdAsync(GetUserIdFromClaims(), id);
-
-            if (task == null)
-            {
-                return NotFound($"Taks with ID {id} not found.");
-            }
-
-            return Ok(task);
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> GetTasksAsync([FromQuery] TaskFilter filter)
-        {
-            var tasks = await _taskService.GetUserTasksAsync(GetUserIdFromClaims(), filter);
-            return Ok(tasks);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateUserTask(UserTaskRequest newUserTaskRequest)
-        {//RequestValidator
-
-            var userId = GetUserId();
-            return Ok(await _taskService.CreateUserTaskAsync(GetUserIdFromClaims(), newUserTaskRequest));
+            _logger = logger;
         }
 
         /// <summary>
-        /// 
+        /// Retrieves a user task by the specified task ID.
         /// </summary>
-        /// <param name="taskId"></param>
-        /// <returns></returns>
-        [HttpDelete]
-        public async Task<IActionResult> DeleteUserTask(Guid taskId)
+        /// <param name="id">The ID of the task to retrieve.</param>
+        /// <returns>Returns a 200 OK status with the task if found; otherwise, returns a 404 Not Found status.</returns>
+        [HttpGet("{id}", Name = nameof(GetTaskByIdAsync))]
+        public async Task<ActionResult<TaskDto?>> GetTaskByIdAsync(Guid id)
         {
-            await _taskService.DeleteUserTaskAsync(GetUserIdFromClaims(), taskId);
-            return Ok();
+            var userId = GetUserIdFromClaims();
+            _logger.LogInformation("User {UserId} is retrieving task with ID {TaskId}.", userId, id);
+
+            var task = await _taskService.GetUserTaskByIdAsync(userId, id);
+
+            if (task != null)
+            {
+                _logger.LogInformation("Task with ID {TaskId} found.", id);
+                return Ok(task);
+            }
+
+            _logger.LogWarning("Task with ID {TaskId} not found.", id);
+            return NotFound(new { Message = $"Task with ID {id} not found.", TaskId = id });
         }
 
+        /// <summary>
+        /// Retrieves user tasks based on the provided filter.
+        /// </summary>
+        /// <param name="filter">The filter criteria for tasks.</param>
+        /// <returns>Returns a 200 OK status with the tasks if found; otherwise, returns a 204 No Content status if no tasks are found.</returns>
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasksAsync([FromQuery] TaskFilter filter)
+        {
+            var userId = GetUserIdFromClaims();
+            _logger.LogInformation("User {UserId} is retrieving tasks with filter {@Filter}.", userId, filter);
+
+            var tasks = await _taskService.GetUserTasksAsync(userId, filter);
+
+            if (tasks == null || !tasks.Any())
+            {
+                _logger.LogInformation("No tasks found for user {UserId}.", userId);
+                return NoContent();
+            }
+
+            _logger.LogInformation("{TaskCount} tasks found for user {UserId}.", tasks.Count(), userId);
+            return Ok(tasks);
+        }
+
+        /// <summary>
+        /// Creates a new user task based on the provided <paramref name="newUserTaskRequest"/>.
+        /// If the task is successfully created, returns a 201 Created response with the location of the new task.
+        /// If an error occurs during the creation process, returns a 500 Internal Server Error response with an error message.
+        /// </summary>
+        /// <param name="newUserTaskRequest">The request object containing the details of the task to be created.</param>
+        /// <returns>A Task representing the asynchronous operation, containing an ActionResult with the created TaskDto.</returns>
+        [HttpPost]
+        public async Task<ActionResult<TaskDto>> CreateUserTask(UserTaskRequest newUserTaskRequest)
+        {
+            try
+            {
+                var userId = GetUserIdFromClaims();
+                _logger.LogInformation("User {UserId} is creating a new task.", userId);
+
+                var createdTask = await _taskService.CreateUserTaskAsync(userId, newUserTaskRequest);
+                _logger.LogInformation("Task with ID {TaskId} created successfully.", createdTask.Id);
+
+                return CreatedAtAction(nameof(GetTaskByIdAsync), new { id = createdTask.Id }, createdTask);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the task.");
+                return StatusCode(500, "An error occurred while creating the task." + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing user task identified by the specified <paramref name="id"/>.
+        /// Returns a 400 Bad Request if the request body is null, a 404 Not Found if the task does not exist,
+        /// or a 204 No Content if the task is successfully updated.
+        /// </summary>
+        /// <param name="id">The ID of the task to be updated.</param>
+        /// <param name="userTaskRequest">The request object containing the updated details of the task.</param>
+        /// <returns>A Task representing the asynchronous operation, containing an ActionResult with the updated TaskDto, or appropriate error responses.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTask(Guid id, [FromBody] UserTaskRequest userTaskRequest)
+        public async Task<ActionResult<TaskDto?>> UpdateTask(Guid id, [FromBody] UserTaskRequest userTaskRequest)
         {
             if (userTaskRequest == null)
             {
-                return BadRequest();
+                _logger.LogWarning("Update request body cannot be null for task ID {TaskId}.", id);
+                return BadRequest(new { Message = "Request body cannot be null." });
             }
 
-            var result = await _taskService.UpdateUserTaskAsync(GetUserIdFromClaims(), id, userTaskRequest);
+            var userId = GetUserIdFromClaims();
+            _logger.LogInformation("User {UserId} is updating task with ID {TaskId}.", userId, id);
+
+            var result = await _taskService.UpdateUserTaskAsync(userId, id, userTaskRequest);
 
             if (result == null)
             {
-                return NotFound($"ID {id} NotFound.");
+                _logger.LogWarning("Task with ID {TaskId} not found for user {UserId}.", id, userId);
+                return NotFound(new { Message = $"Task with ID {id} not found." });
             }
 
+            _logger.LogInformation("Task with ID {TaskId} updated successfully.", id);
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Deletes a user task identified by the specified <paramref name="taskId"/>.
+        /// Returns a 204 No Content if the task is successfully deleted,
+        /// or a 404 Not Found if the task does not exist.
+        /// </summary>
+        /// <param name="taskId">The ID of the task to be deleted.</param>
+        /// <returns>A Task representing the asynchronous operation, containing an ActionResult indicating the result of the operation.</returns>
+        [HttpDelete("{taskId}")]
+        public async Task<ActionResult<bool>> DeleteUserTask(Guid taskId)
+        {
+            var userId = GetUserIdFromClaims();
+            _logger.LogInformation("User {UserId} is attempting to delete task with ID {TaskId}.", userId, taskId);
+
+            var isDeleted = await _taskService.DeleteUserTaskAsync(userId, taskId);
+
+            if (!isDeleted)
+            {
+                _logger.LogWarning("Task with ID {TaskId} not found for user {UserId}.", taskId, userId);
+                return NotFound(new { Message = $"Task with ID {taskId} not found." });
+            }
+
+            _logger.LogInformation("Task with ID {TaskId} deleted successfully.", taskId);
             return NoContent();
         }
 

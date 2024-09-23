@@ -4,6 +4,7 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppEfContext))]
-    partial class AppEfContextModelSnapshot : ModelSnapshot
+    [Migration("20240922153915_AddIndexesToUserTaskManual")]
+    partial class AddIndexesToUserTaskManual
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,15 +90,9 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DueDate");
-
-                    b.HasIndex("Priority");
-
-                    b.HasIndex("Status");
-
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserTasks");
+                    b.ToTable("MyTasks");
                 });
 
             modelBuilder.Entity("DAL.Entities.UserTask", b =>

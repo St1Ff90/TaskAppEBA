@@ -53,6 +53,8 @@ namespace TaskAppEBA
                 });
             builder.Services.AddControllers();
 
+            builder.Logging.AddConsole(); 
+
             if (builder.Environment.IsDevelopment())
             {
                 builder.Services.AddEndpointsApiExplorer();

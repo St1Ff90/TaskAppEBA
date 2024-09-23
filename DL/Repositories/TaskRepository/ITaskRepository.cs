@@ -8,12 +8,12 @@ namespace DAL.Repositories.TaskRepository.TaskRepository
     {
         Task<UserTask> CreateAsync(UserTask task);
         Task<UserTask> UpdateUserTaskAsync(UserTask task);
-        Task DeleteUserTaskAsync(Guid userId, Guid taskId);
+        Task<bool> DeleteUserTaskAsync(Guid userId, Guid taskId);
         Task<UserTask?> GetUserTaskAsync(Guid userId, Guid id);
         Task<IEnumerable<UserTask>> GetUserTasksAsunc(Expression<Func<UserTask, bool>> predicate,
             int pageNumber,
             int pageSize,
             SortField sortBy,
-            bool byAsc);
+            bool isAsc);
     }
 }

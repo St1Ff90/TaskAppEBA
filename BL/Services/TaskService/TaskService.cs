@@ -6,6 +6,7 @@ using BL.Models.Requests;
 using DAL.Entities;
 using DAL.Repositories.TaskRepository.TaskRepository;
 using LinqKit;
+using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
@@ -15,40 +16,143 @@ namespace BL.Services.TaskService
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository _taskRepository;
+        private readonly ILogger<TaskService> _logger;
 
-        public TaskService(ITaskRepository taskRepository)
+        public TaskService(ITaskRepository taskRepository, ILogger<TaskService> logger)
         {
             _taskRepository = taskRepository;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<TaskDto>> GetUserTasksAsync(Guid userId, TaskFilter filter)
         {
-            var predicat = CreatePredicate(userId, filter);
-            var selectedTasks = await _taskRepository
-              .GetUserTasksAsunc(predicat, filter.PageNumber, filter.PageSize,
-              filter.SortBy,
-              filter.isAsc);
+            try
+            {
+                _logger.LogInformation("Retrieving tasks for user {UserId} with filter {Filter}.", userId, filter);
 
-            return selectedTasks.Select(x => TaskMapper.MapModelToTaskDto(x)!);
+                var predicate = CreatePredicate(userId, filter);
+                var selectedTasks = await _taskRepository
+                    .GetUserTasksAsunc(predicate, filter.PageNumber, filter.PageSize, filter.SortBy, filter.isAsc);
+
+                _logger.LogInformation("{TaskCount} tasks retrieved for user {UserId}.", selectedTasks.Count(), userId);
+
+                return selectedTasks.Select(x => TaskMapper.MapModelToTaskDto(x)!);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving tasks for user {UserId}.", userId);
+                throw new Exception("An error occurred while retrieving tasks.");
+            }
         }
 
         public async Task<TaskDto> CreateUserTaskAsync(Guid userId, UserTaskRequest newUserTaskRequest)
         {
-            var task = TaskMapper.MapToTaskModel(newUserTaskRequest);
-            task.Id = Guid.NewGuid();
-            task.UserId = userId;
-            var currentDate = DateTime.UtcNow.Date;
-            task.CreatedAt = currentDate;
-            task.UpdatedAt = currentDate;
+            try
+            {
+                _logger.LogInformation("Creating a new task for user {UserId}.", userId);
 
-            var entity = await _taskRepository.CreateAsync(task);
-            return TaskMapper.MapModelToTaskDto(entity);
+                var task = TaskMapper.MapToTaskModel(newUserTaskRequest);
+                task.Id = Guid.NewGuid();
+                task.UserId = userId;
+                var currentDate = DateTime.UtcNow.Date;
+                task.CreatedAt = currentDate;
+                task.UpdatedAt = currentDate;
+
+                var entity = await _taskRepository.CreateAsync(task);
+
+                _logger.LogInformation("Task with ID {TaskId} created for user {UserId}.", task.Id, userId);
+
+                return TaskMapper.MapModelToTaskDto(entity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating task for user {UserId}.", userId);
+                throw new Exception("An error occurred while creating the task.");
+            }
         }
 
-        public async Task DeleteUserTaskAsync(Guid userId, Guid taskId)
+        public async Task<bool> DeleteUserTaskAsync(Guid userId, Guid taskId)
         {
-            //_logger.LogWarning($"Delete task request from user:{userId}. Task Id: {taskId}")
-            await _taskRepository.DeleteUserTaskAsync(userId, taskId);
+            try
+            {
+                _logger.LogInformation("Deleting task {TaskId} for user {UserId}.", taskId, userId);
+
+                var result = await _taskRepository.DeleteUserTaskAsync(userId, taskId);
+
+                if (result)
+                {
+                    _logger.LogInformation("Task {TaskId} successfully deleted for user {UserId}.", taskId, userId);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to delete task {TaskId} for user {UserId}. Task not found.", taskId, userId);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting task {TaskId} for user {UserId}.", taskId, userId);
+                throw new Exception("An error occurred while deleting the task.");
+            }
+        }
+
+        public async Task<TaskDto?> GetUserTaskByIdAsync(Guid userId, Guid taskId)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving task {TaskId} for user {UserId}.", taskId, userId);
+
+                var task = await _taskRepository.GetUserTaskAsync(userId, taskId);
+
+                if (task == null)
+                {
+                    _logger.LogWarning("Task {TaskId} not found for user {UserId}.", taskId, userId);
+                    return null;
+                }
+
+                _logger.LogInformation("Task {TaskId} retrieved for user {UserId}.", taskId, userId);
+
+                return TaskMapper.MapModelToTaskDto(task);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving task {TaskId} for user {UserId}.", taskId, userId);
+                throw new Exception("An error occurred while retrieving the task.");
+            }
+        }
+
+        public async Task<TaskDto?> UpdateUserTaskAsync(Guid userId, Guid taskId, UserTaskRequest userTaskRequest)
+        {
+            try
+            {
+                _logger.LogInformation("Updating task {TaskId} for user {UserId}.", taskId, userId);
+
+                var task = await _taskRepository.GetUserTaskAsync(userId, taskId);
+
+                if (task != null)
+                {
+                    task.UpdatedAt = DateTime.UtcNow;
+                    task.Title = userTaskRequest.Title;
+                    task.Description = userTaskRequest.Description;
+                    task.Status = (int)userTaskRequest.Status;
+                    task.DueDate = userTaskRequest.DueDate;
+                    task.Priority = (int)userTaskRequest.Priority;
+
+                    var updatedTask = await _taskRepository.UpdateUserTaskAsync(task);
+
+                    _logger.LogInformation("Task {TaskId} updated for user {UserId}.", taskId, userId);
+                    return TaskMapper.MapModelToTaskDto(updatedTask);
+                }
+
+                _logger.LogWarning("Task {TaskId} not found for user {UserId}, unable to update.", taskId, userId);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating task {TaskId} for user {UserId}.", taskId, userId);
+                throw new Exception("An error occurred while updating the task. Please try again later.");
+            }
         }
 
         private Expression<Func<UserTask, bool>> CreatePredicate(Guid userId, TaskFilter filter)
@@ -71,41 +175,5 @@ namespace BL.Services.TaskService
             return predicate;
         }
 
-        public async Task<TaskDto?> GetUserTaskByIdAsync(Guid userId, Guid taskId)
-        {
-            var task = await _taskRepository
-              .GetUserTaskAsync(userId, taskId);
-
-            return TaskMapper.MapModelToTaskDto(task);
-        }
-
-        public async Task<TaskDto?> UpdateUserTaskAsync(Guid userId, Guid taskId, UserTaskRequest userTaskRequest)
-        {
-            //var userTask = new UserTask
-            //{
-            //    Id = taskId,
-            //    UserId = userId,
-            //    Description = userTaskRequest.Description,
-            //    DueDate = userTaskRequest.DueDate,
-            //    Priority = (int?)userTaskRequest.Priority,
-            //    Title = userTaskRequest.Title,
-            //    Status = (int?)userTaskRequest.Status
-            //}
-            var task = await _taskRepository
-              .GetUserTaskAsync(userId, taskId);
-
-            if (task != null)
-            {
-                task.UpdatedAt = DateTime.UtcNow;
-                task.Title = userTaskRequest.Title;
-                task.Description = userTaskRequest.Description;
-                task.Status = (int)userTaskRequest.Status;
-                task.DueDate = userTaskRequest.DueDate;
-                task.Priority = (int)userTaskRequest.Priority;
-
-                return Mappers.TaskMapper.MapModelToTaskDto(await _taskRepository.UpdateUserTaskAsync(task));
-            }
-            return null;
-        }
     }
 }

@@ -8,6 +8,6 @@ namespace Core.Models
 {
     public enum SortField
     {
-        DueDate, Priority, Status, Title
+        DueDate, Priority
     }
 }
