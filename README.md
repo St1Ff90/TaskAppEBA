@@ -24,7 +24,7 @@ git clone https://github.com/St1Ff90/TaskAppEBA
 cd TaskAppEBA
 ```
 
-Configure Database
+### Configure Database
 
     Create a new database in your SQL Server instance.
 
@@ -36,15 +36,15 @@ Configure Database
         "Default": "Server=your_server;Database=your_database;User Id=your_username;Password=your_password;"
     }
 
-Run Migrations
+### Run Migrations
 
 Navigate to the DAL project folder and run the following command to apply migrations:
 
-bash
-
+```bash
 dotnet ef database update
+```
 
-Build and Run the Project
+### Build and Run the Project
 
     Open the project in your preferred IDE (e.g., Visual Studio, VS Code).
 
@@ -56,12 +56,12 @@ Build and Run the Project
 
     dotnet run --project API
 
-The API should now be running at https://localhost:5001 or http://localhost:5000.
-API Documentation
+### The API should now be running at https://localhost:5001 or http://localhost:5000.
+## API Documentation
 
-The API exposes the following endpoints:
-User Endpoints
-Register a New User
+### The API exposes the following endpoints:
+#### User Endpoints
+##### Register a New User
 
     Endpoint: POST /users/register
 
@@ -77,7 +77,7 @@ Register a New User
 
     Response: 200 OK on success.
 
-User Login
+##### User Login
 
     Endpoint: POST /users/login
 
@@ -94,8 +94,8 @@ User Login
         200 OK with JWT token on success.
         401 Unauthorized if credentials are invalid.
 
-Task Endpoints
-Retrieve User Tasks
+#### Task Endpoints
+##### Retrieve User Tasks
 
     Endpoint: GET /tasks
     Query Parameters: Use filters such as status, priority, pageNumber, pageSize.
@@ -103,14 +103,14 @@ Retrieve User Tasks
         200 OK with the list of tasks.
         204 No Content if no tasks found.
 
-Get Task by ID
+##### Get Task by ID
 
     Endpoint: GET /tasks/{id}
     Response:
         200 OK with the task object if found.
         404 Not Found if the task does not exist.
 
-Create a New Task
+##### Create a New Task
 
     Endpoint: POST /tasks
 
@@ -130,7 +130,7 @@ Create a New Task
         201 Created with the created task.
         500 Internal Server Error if an error occurs.
 
-Update a Task
+##### Update a Task
 
     Endpoint: PUT /tasks/{id}
     Request Body: Similar to create task body.
@@ -138,17 +138,17 @@ Update a Task
         204 No Content if successfully updated.
         404 Not Found if the task does not exist.
 
-Delete a Task
+##### Delete a Task
 
     Endpoint: DELETE /tasks/{id}
     Response:
         204 No Content if successfully deleted.
         404 Not Found if the task does not exist.
 
-Architecture and Design Choices
-Overview
+## Architecture and Design Choices
+### Overview
 
-The application is designed using a clean architecture approach, separating concerns into different layers:
+#### The application is designed using a clean architecture approach, separating concerns into different layers:
 
     API: This layer handles HTTP requests, routing, and responses. It uses controllers to manage incoming requests and coordinate with the Business Logic Layer.
 
@@ -158,7 +158,7 @@ The application is designed using a clean architecture approach, separating conc
 
     Core: Contains common models, DTOs, and utilities shared across the application.
 
-Design Choices
+#### Design Choices
 
     Entity Framework Core: Used for ORM to simplify database interactions and manage migrations.
 
@@ -172,6 +172,6 @@ Design Choices
 
     Asynchronous Programming: Employed throughout the application to enhance performance and responsiveness.
 
-Conclusion
+## Conclusion
 
 This project serves as a robust foundation for a task management application, demonstrating best practices in software architecture, design patterns, and modern .NET development. For any questions or issues, feel free to open an issue in the repository.
