@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppEfContext))]
-    [Migration("20240922154847_TableNamesUpdate")]
-    partial class TableNamesUpdate
+    [Migration("20240922154847_entitiesNamesUpdate")]
+    partial class entitiesNamesUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

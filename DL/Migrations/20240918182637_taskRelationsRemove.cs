@@ -5,7 +5,7 @@
 namespace DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class taskEntityUpdats5 : Migration
+    public partial class taskRelationsRemove : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

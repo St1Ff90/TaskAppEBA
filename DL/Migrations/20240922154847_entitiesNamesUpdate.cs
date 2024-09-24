@@ -5,7 +5,7 @@
 namespace DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class TableNamesUpdate : Migration
+    public partial class entitiesNamesUpdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

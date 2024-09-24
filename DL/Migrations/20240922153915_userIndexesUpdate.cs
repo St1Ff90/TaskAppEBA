@@ -5,7 +5,7 @@
 namespace DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIndexesToUserTaskManual : Migration
+    public partial class userIndexesUpdate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

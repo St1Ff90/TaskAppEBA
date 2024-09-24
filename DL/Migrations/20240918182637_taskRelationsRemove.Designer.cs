@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppEfContext))]
-    [Migration("20240918182131_taskEntityUpdatse4")]
-    partial class taskEntityUpdatse4
+    [Migration("20240918182637_taskRelationsRemove")]
+    partial class taskRelationsRemove
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,12 +44,7 @@ namespace DAL.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("MyTasks");
                 });
@@ -84,18 +79,6 @@ namespace DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("MyUsers");
-                });
-
-            modelBuilder.Entity("DAL.Entities.MyTask", b =>
-                {
-                    b.HasOne("DAL.Entities.User", null)
-                        .WithMany("Tasks")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("DAL.Entities.User", b =>
-                {
-                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppEfContext))]
-    [Migration("20240918161741_taskEntityUpdate")]
-    partial class taskEntityUpdate
+    [Migration("20240905075609_userUpdate")]
+    partial class userUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DAL.Entities.MyTask", b =>
+            modelBuilder.Entity("DAL.Entities.Task", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,12 +39,6 @@ namespace DAL.Migrations
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -95,7 +89,7 @@ namespace DAL.Migrations
                     b.ToTable("MyUsers");
                 });
 
-            modelBuilder.Entity("DAL.Entities.MyTask", b =>
+            modelBuilder.Entity("DAL.Entities.Task", b =>
                 {
                     b.HasOne("DAL.Entities.User", "User")
                         .WithMany("Tasks")
