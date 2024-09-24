@@ -22,6 +22,7 @@ To run the project locally, follow these steps:
 ```bash
 git clone https://github.com/St1Ff90/TaskAppEBA
 cd TaskAppEBA
+```
 
 Configure Database
 
