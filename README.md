@@ -51,10 +51,9 @@ dotnet ef database update
     Build the solution to restore dependencies.
 
     Run the API project:
-
-    bash
-
+```bash
     dotnet run --project API
+```
 
 ### The API should now be running at https://localhost:5001 or http://localhost:5000.
 ## API Documentation
@@ -160,13 +159,13 @@ dotnet ef database update
 
 #### Design Choices
 
-    Entity Framework Core: Used for ORM to simplify database interactions and manage migrations.
+    Entity Framework Core: Used for ORM to simplify database usage and manage migrations.
 
     JWT Authentication: Implemented for secure access to the API, allowing only authenticated users to access protected endpoints.
 
-    Logging: Integrated with ILogger to provide insights into the application behavior and error handling.
+    Logging: Integrated with ILogger to provide into on the application acting and error handling.
 
-    Dependency Injection: Leveraged throughout the application for better testability and separation of concerns.
+    Dependency Injection: Used throughout the application for better testability and separation of concerns.
 
     DTOs (Data Transfer Objects): Used to define the data shape sent to and from the API, ensuring that the internal model is not exposed directly.
 
