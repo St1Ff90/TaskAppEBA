@@ -19,7 +19,6 @@ namespace BL.Services.TokenService
             _logger = logger;
         }
 
-
         public string GenerateToken(Guid userId)
         {
             _logger.LogInformation("Generating token for user with ID: {UserId}", userId);

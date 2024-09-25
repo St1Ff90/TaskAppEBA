@@ -25,13 +25,13 @@ namespace BL.Services.UserService
 
         public async Task RegisterAsync(RegistrationRequest registrationRequest)
         {
-            _logger.LogInformation("Attempting to register user with email: {Email}", registrationRequest.Email);
-
             if (registrationRequest == null)
             {
                 _logger.LogError("Registration failed: registrationRequest is null.");
                 throw new ArgumentNullException(nameof(registrationRequest), "Registration request cannot be null.");
             }
+
+            _logger.LogInformation("Attempting to register user with email: {Email}", registrationRequest.Email);
 
             if (string.IsNullOrEmpty(registrationRequest.Email))
             {
@@ -73,13 +73,13 @@ namespace BL.Services.UserService
 
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
-            _logger.LogInformation("Attempting login for user with email: {Email}", loginDto.Email);
-
             if (loginDto == null)
             {
                 _logger.LogError("Login failed: loginDto is null.");
                 throw new ArgumentNullException(nameof(loginDto), "Login request cannot be null.");
             }
+
+            _logger.LogInformation("Attempting login for user with email: {Email}", loginDto.Email);
 
             if (string.IsNullOrEmpty(loginDto.Email))
             {

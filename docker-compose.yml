@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Jyz8myMouse
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  taskappeba:
+    build:
+      context: .
+      dockerfile: ./TaskAppEBA/Dockerfile  # Укажите путь к вашему Dockerfile приложения
+    ports:
+      - "8080:8080"  # Используйте тот же порт, что и в Dockerfile
+    depends_on:
+      - sqlserver
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=YourDatabase;User Id=sa;Password=Jyz8myMouse;
+
+volumes:
+  sql_data:
