@@ -28,4 +28,4 @@ jobs:
       run: dotnet build TaskAppEBA.sln --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test BL.Tests/BL.Tests.csproj --no-build --verbosity normal
+      run: dotnet test BL.Tests/BL.Tests.csproj --verbosity normal
