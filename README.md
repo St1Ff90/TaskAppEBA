@@ -45,10 +45,10 @@ Ensure that the connection string in the taskappeba service of your docker-compo
 
     Run the API project:
 ```bash
-    dotnet run --project API
+    dotnet run --TaskAppEBA
 ```
 
-### The API should now be running at https://localhost:5001 or http://localhost:5000.
+### The API should now be running at https://localhost:8081 or http://localhost:8080.
 ## API Documentation
 
 ### The API exposes the following endpoints:
