@@ -25,7 +25,7 @@ jobs:
       run: dotnet restore TaskAppEBA.sln
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build TaskAppEBA.sln --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test TaskAppEBA.sln --no-build --verbosity normal
