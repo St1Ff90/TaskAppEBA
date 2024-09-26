@@ -324,7 +324,7 @@ namespace BL.Tests.Services
             var result = await _userService.LoginAsync(loginDto);
 
             // Assert
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
 
             // Logging check
             _loggerMock.Verify(
@@ -365,7 +365,7 @@ namespace BL.Tests.Services
             var result = await _userService.LoginAsync(loginDto);
 
             // Assert
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
 
             // Shoul call VerifySameHash
             _hashServiceMock.Verify(hash => hash.VerifySameHash(loginDto.Password, user.PasswordHash), Times.Once);
@@ -414,7 +414,7 @@ namespace BL.Tests.Services
             var result = await _userService.LoginAsync(loginDto);
 
             // Assert
-            Assert.AreEqual(expectedToken, result);
+            Assert.That(expectedToken, Is.EqualTo(result));
 
             // Should call VerifySameHash and GenerateToken
             _hashServiceMock.Verify(hash => hash.VerifySameHash(loginDto.Password, user.PasswordHash), Times.Once);
@@ -449,7 +449,7 @@ namespace BL.Tests.Services
             var ex = Assert.ThrowsAsync<Exception>(async () => await _userService.LoginAsync(loginDto));
             Assert.That(ex.Message, Is.EqualTo("An error occurred while generating the token."));
 
-                 }
+        }
 
         #endregion
     }

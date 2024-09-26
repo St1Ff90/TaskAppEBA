@@ -48,8 +48,8 @@ namespace BL.Tests.Services
             var result = await _taskService.GetUserTasksAsync(userId, filter);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(2));
         }
 
         [Test]
@@ -68,8 +68,9 @@ namespace BL.Tests.Services
             var result = await _taskService.CreateUserTaskAsync(userId, request);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(request.Title, result.Title);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Title, Is.EqualTo(request.Title));
+            //Assert.AreEqual(request.Title, result.Title);
             _taskRepositoryMock.Verify(repo => repo.CreateAsync(It.Is<UserTask>(task => task.Title == request.Title && task.UserId == userId)), Times.Once);
         }
 
@@ -87,7 +88,7 @@ namespace BL.Tests.Services
             var result = await _taskService.DeleteUserTaskAsync(userId, taskId);
 
             // Assert
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -105,8 +106,8 @@ namespace BL.Tests.Services
             var result = await _taskService.GetUserTaskByIdAsync(userId, taskId);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(task.Title, result.Title);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Title, Is.EqualTo(task.Title));
         }
 
         [Test]
@@ -127,8 +128,8 @@ namespace BL.Tests.Services
             var result = await _taskService.UpdateUserTaskAsync(userId, taskId, request);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(request.Title, result.Title);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Title, Is.EqualTo(request.Title));
         }
 
         [Test]
@@ -145,7 +146,7 @@ namespace BL.Tests.Services
             var result = await _taskService.GetUserTaskByIdAsync(userId, taskId);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -162,7 +163,7 @@ namespace BL.Tests.Services
             var result = await _taskService.DeleteUserTaskAsync(userId, taskId);
 
             // Assert
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
     }
 }
