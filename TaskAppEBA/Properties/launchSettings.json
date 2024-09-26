@@ -17,7 +17,6 @@
       "environmentVariables": {
         "ASPNETCORE_HTTPS_PORT": "8081",
         "ASPNETCORE_URLS": "https://+:8081;http://+:8080",
-        "ConnectionStrings__Default": "Data Source=sqlserver;Initial Catalog=TaskDb;User ID=sa;Password=Jyz8myMouse;Encrypt=False;Trust Server Certificate=True;"
       },
       "publishAllPorts": true,
       "useSSL": true

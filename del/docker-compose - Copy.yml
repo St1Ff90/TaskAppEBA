@@ -1,0 +1,6 @@
+services:
+  taskappeba:
+    image: ${DOCKER_REGISTRY-}taskappeba
+    build:
+      context: .
+      dockerfile: TaskAppEBA/Dockerfile

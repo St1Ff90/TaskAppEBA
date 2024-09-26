@@ -14,8 +14,8 @@ To run the project locally, follow these steps:
 
 ### Prerequisites
 
-1. **.NET SDK**: Ensure you have [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) installed on your machine.
-2. **Database**: This project uses SQL Server. Make sure you have access to a SQL Server instance.
+1. Docker: Ensure you have Docker installed on your machine.
+2. Docker Compose: Docker Desktop includes Docker Compose; ensure it’s enabled.
 
 ### Clone the Repository
 
@@ -26,22 +26,15 @@ cd TaskAppEBA
 
 ### Configure Database
 
-    Create a new database in your SQL Server instance.
+#### Database Configuration: 
 
-    Update the connection string in appsettings.json located in the API project folder:
+The project uses SQL Server. The connection string is specified in the docker-compose.yml file and is set to use the SA account. You can change the password and database name as needed.
 
-    json
+Ensure that the connection string in the taskappeba service of your docker-compose.yml file is correct:
 
-    "ConnectionStrings": {
-        "Default": "Server=your_server;Database=your_database;User Id=your_username;Password=your_password;"
-    }
-
-### Run Migrations
-
-Navigate to the DAL project folder and run the following command to apply migrations:
-
-```bash
-dotnet ef database update
+```yaml
+  environment:
+  - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TaskDb;User Id=sa;Password=*********;Encrypt=False;Trust Server Certificate=True;  
 ```
 
 ### Build and Run the Project

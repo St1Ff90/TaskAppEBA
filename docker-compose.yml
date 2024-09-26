@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -14,13 +12,17 @@ services:
   taskappeba:
     build:
       context: .
-      dockerfile: ./TaskAppEBA/Dockerfile  # Укажите путь к вашему Dockerfile приложения
+      dockerfile: TaskAppEBA/Dockerfile
     ports:
-      - "8080:8080"  # Используйте тот же порт, что и в Dockerfile
+      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - sqlserver
     environment:
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=YourDatabase;User Id=sa;Password=Jyz8myMouse;
+      - ConnectionStrings__DefaultConnection=Server=dockercompose9436897743579848051-sqlserver-1;Database=TaskDb;User Id=sa;Password=Jyz8myMouse;Encrypt=False;Trust Server Certificate=True;
+    command: >
+      /bin/sh -c "dotnet ef database update --no-build && dotnet your_app.dll"
 
 volumes:
   sql_data:
+
