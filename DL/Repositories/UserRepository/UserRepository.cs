@@ -27,9 +27,6 @@ namespace DAL.Repositories.UserRepository.UserRepository
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            _db.Database.OpenConnection();
-            _db.Database.CloseConnection();
-
             var user = await _db.MyUsers.SingleOrDefaultAsync(x => x.Email == email);
 
             if (user != null)
