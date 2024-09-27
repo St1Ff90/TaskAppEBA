@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using BL.Models.DTO;
+﻿using BL.Models.DTO;
 using BL.Models.Requests;
 using BL.Services.TokenService;
 using BL.Services.UserService;
@@ -9,7 +7,6 @@ using DAL.Repositories.UserRepository.UserRepository;
 using Lection2_Core_BL.Services.HashService;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
 
 namespace BL.Tests.Services
 {
@@ -78,7 +75,7 @@ namespace BL.Tests.Services
             var ex = Assert.ThrowsAsync<ArgumentException>(async () => await _userService.RegisterAsync(registrationRequest));
             Assert.That(ex.Message, Does.Contain("Email cannot be empty."));
 
-            // Проверка логирования ошибки
+            // Logging check
             _loggerMock.Verify(
                 x => x.Log(
                     LogLevel.Error,
@@ -222,7 +219,8 @@ namespace BL.Tests.Services
                 x => x.Log(
                     LogLevel.Error,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"An error occurred while registering the user with email: {registrationRequest.Email}")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()
+                    .Contains($"An error occurred while registering the user with email: {registrationRequest.Email}")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once

@@ -1,5 +1,4 @@
 ﻿using Core.Models;
-using DAL.Repositories.TaskRepository.TaskRepository;
 using System.ComponentModel.DataAnnotations;
 
 namespace BL.Models.Filters

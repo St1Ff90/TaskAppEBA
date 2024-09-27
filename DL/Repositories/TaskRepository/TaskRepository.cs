@@ -1,7 +1,6 @@
 ﻿using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Linq;
 using Core.Models;
 using Microsoft.Extensions.Logging;
 

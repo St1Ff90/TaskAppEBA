@@ -2,7 +2,6 @@
 using BL.Models.Filters;
 using BL.Models.Requests;
 using BL.Services.TaskService;
-using DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,24 +10,18 @@ namespace TaskAppEBA.Controllers
 {
     [Authorize]
     [Route("[controller]")]
-    public class TasksController : ControllerBase
+    public class TasksController(ITaskService _taskService, ILogger<TasksController> _logger) : ControllerBase
     {
         private readonly Func<Guid> GetUserIdFromClaims;
-        private readonly ITaskService _taskService;
-        private readonly ILogger<TasksController> _logger;
-
-        public TasksController(ITaskService taskService, ILogger<TasksController> logger)
-        {
-            _taskService = taskService;
-            GetUserIdFromClaims = GetUserId;
-            _logger = logger;
-        }
 
         /// <summary>
         /// Retrieves a user task by the specified task ID.
         /// </summary>
         /// <param name="id">The ID of the task to retrieve.</param>
-        /// <returns>Returns a 200 OK status with the task if found; otherwise, returns a 404 Not Found status.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> object representing the user task if found, along with a <see cref="System.Net.HttpStatusCode.OK"/> status; 
+        /// otherwise, returns a <see cref="System.Net.HttpStatusCode.NotFound"/> status.
+        /// </returns>
         [HttpGet("{id}", Name = nameof(GetTaskByIdAsync))]
         public async Task<ActionResult<TaskDto?>> GetTaskByIdAsync(Guid id)
         {
@@ -48,10 +41,13 @@ namespace TaskAppEBA.Controllers
         }
 
         /// <summary>
-        /// Retrieves user tasks based on the provided filter.
+        /// Retrieves user tasks based on the provided <paramref name="filter"/>.
         /// </summary>
         /// <param name="filter">The filter criteria for tasks.</param>
-        /// <returns>Returns a 200 OK status with the tasks if found; otherwise, returns a 204 No Content status if no tasks are found.</returns>
+        /// <returns>
+        /// A list of tasks with a <see cref="System.Net.HttpStatusCode.OK"/> status if tasks are found; 
+        /// otherwise, returns a <see cref="System.Net.HttpStatusCode.NoContent"/> status if no tasks are found.
+        /// </returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasksAsync([FromQuery] TaskFilter filter)
         {
@@ -72,11 +68,13 @@ namespace TaskAppEBA.Controllers
 
         /// <summary>
         /// Creates a new user task based on the provided <paramref name="newUserTaskRequest"/>.
-        /// If the task is successfully created, returns a 201 Created response with the location of the new task.
-        /// If an error occurs during the creation process, returns a 500 Internal Server Error response with an error message.
+        /// If the task is successfully created, returns a <see cref="System.Net.HttpStatusCode.Created"/> response with the location of the new task.
+        /// If an error occurs during the creation process, returns a <see cref="System.Net.HttpStatusCode.InternalServerError"/> response with an error message.
         /// </summary>
         /// <param name="newUserTaskRequest">The request object containing the details of the task to be created.</param>
-        /// <returns>A Task representing the asynchronous operation, containing an ActionResult with the created TaskDto.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation, containing an <see cref="ActionResult"/> with the created <see cref="TaskDto"/>.
+        /// </returns>
         [HttpPost]
         public async Task<ActionResult<TaskDto>> CreateUserTask(UserTaskRequest newUserTaskRequest)
         {
@@ -99,12 +97,16 @@ namespace TaskAppEBA.Controllers
 
         /// <summary>
         /// Updates an existing user task identified by the specified <paramref name="id"/>.
-        /// Returns a 400 Bad Request if the request body is null, a 404 Not Found if the task does not exist,
-        /// or a 204 No Content if the task is successfully updated.
+        /// Returns a <see cref="System.Net.HttpStatusCode.BadRequest"/> if the request body is null, 
+        /// a <see cref="System.Net.HttpStatusCode.NotFound"/> if the task does not exist, 
+        /// or a <see cref="System.Net.HttpStatusCode.NoContent"/> if the task is successfully updated.
         /// </summary>
         /// <param name="id">The ID of the task to be updated.</param>
         /// <param name="userTaskRequest">The request object containing the updated details of the task.</param>
-        /// <returns>A Task representing the asynchronous operation, containing an ActionResult with the updated TaskDto, or appropriate error responses.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation, containing an <see cref="ActionResult"/> with the updated <see cref="TaskDto"/>, 
+        /// or appropriate error responses.
+        /// </returns>
         [HttpPut("{id}")]
         public async Task<ActionResult<TaskDto?>> UpdateTask(Guid id, [FromBody] UserTaskRequest userTaskRequest)
         {
@@ -131,11 +133,14 @@ namespace TaskAppEBA.Controllers
 
         /// <summary>
         /// Deletes a user task identified by the specified <paramref name="taskId"/>.
-        /// Returns a 204 No Content if the task is successfully deleted,
-        /// or a 404 Not Found if the task does not exist.
+        /// Returns a <see cref="System.Net.HttpStatusCode.NoContent"/> if the task is successfully deleted,
+        /// or a <see cref="System.Net.HttpStatusCode.NotFound"/> if the task does not exist.
         /// </summary>
         /// <param name="taskId">The ID of the task to be deleted.</param>
-        /// <returns>A Task representing the asynchronous operation, containing an ActionResult indicating the result of the operation.</returns>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation, containing an <see cref="ActionResult"/> indicating the result of the operation.
+        /// </returns>
+
         [HttpDelete("{taskId}")]
         public async Task<ActionResult<bool>> DeleteUserTask(Guid taskId)
         {

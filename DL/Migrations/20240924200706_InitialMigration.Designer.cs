@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppEfContext))]
-    [Migration("20240924200706_Migration to docker container")]
+    [Migration("20240924200706_InitialMigration")]
     partial class Migrationtodockercontainer
     {
         /// <inheritdoc />

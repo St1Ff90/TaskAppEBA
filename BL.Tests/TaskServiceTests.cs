@@ -1,4 +1,3 @@
-using BL.Models.DTO;
 using BL.Models.Filters;
 using BL.Models.Requests;
 using BL.Services.TaskService;
@@ -6,11 +5,7 @@ using DAL.Entities;
 using DAL.Repositories.TaskRepository.TaskRepository;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace BL.Tests.Services
 {
@@ -35,21 +30,31 @@ namespace BL.Tests.Services
             // Arrange
             var userId = Guid.NewGuid();
             var filter = new TaskFilter { PageNumber = 1, PageSize = 10, SortBy = Core.Models.SortField.Priority, isAsc = true };
-            var tasks = new List<UserTask>
+            var expectedTasks = new List<UserTask>
             {
-                new UserTask {Id = Guid.NewGuid(), UserId = userId, Title = "Test Task 1", Status = (int)Status.Pending, Priority = (int)Priority.Low},
+                new UserTask { Id = Guid.NewGuid(), UserId = userId, Title = "Test Task 1", Status = (int)Status.Pending, Priority = (int)Priority.Low },
                 new UserTask { Id = Guid.NewGuid(), UserId = userId, Title = "Test Task 2", Status = (int)Status.Pending, Priority = (int)Priority.Low }
             };
 
-            _taskRepositoryMock.Setup(repo => repo.GetUserTasksAsunc(It.IsAny<Expression<Func<UserTask, bool>>>(), filter.PageNumber, filter.PageSize, Core.Models.SortField.Priority, true))
-                               .ReturnsAsync(tasks);
+            _taskRepositoryMock.Setup(repo => repo
+            .GetUserTasksAsunc(It.IsAny<Expression<Func<UserTask, bool>>>(), filter.PageNumber, filter.PageSize, Core.Models.SortField.Priority, true))
+                               .ReturnsAsync(expectedTasks);
 
             // Act
             var result = await _taskService.GetUserTasksAsync(userId, filter);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(2));
+            Assert.That(result.Count(), Is.EqualTo(expectedTasks.Count));
+
+            // Compare each property of the tasks
+            for (int i = 0; i < expectedTasks.Count; i++)
+            {
+                Assert.That(result.ElementAt(i).Id, Is.EqualTo(expectedTasks[i].Id));
+                Assert.That(result.ElementAt(i).Title, Is.EqualTo(expectedTasks[i].Title));
+                Assert.That(result.ElementAt(i).Status, Is.EqualTo((Status)expectedTasks[i].Status));
+                Assert.That(result.ElementAt(i).Priority, Is.EqualTo((Priority)expectedTasks[i].Priority));
+            }
         }
 
         [Test]
@@ -57,8 +62,10 @@ namespace BL.Tests.Services
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var request = new UserTaskRequest { Title = "New Task", Description = "Task Description", Status = Status.Pending, Priority = Priority.Low };
-            var newTask = new UserTask { Id = Guid.NewGuid(), UserId = userId, Title = "New Task", Status = (int)Status.Pending, Priority = (int)Priority.Low };
+            var request = new UserTaskRequest { Title = "New Task", 
+                Description = "Task Description", Status = Status.Pending, Priority = Priority.Low };
+            var newTask = new UserTask { Id = Guid.NewGuid(), UserId = userId, Title = "New Task", 
+                Description = "Task Description", Status = (int)Status.Pending, Priority = (int)Priority.Low };
 
             // Set up the TaskMapper mapping
             _taskRepositoryMock.Setup(m => m.CreateAsync(It.IsAny<UserTask>()))
@@ -70,7 +77,9 @@ namespace BL.Tests.Services
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Title, Is.EqualTo(request.Title));
-            //Assert.AreEqual(request.Title, result.Title);
+            Assert.That(result.Description, Is.EqualTo(request.Description));
+            Assert.That(result.Status, Is.EqualTo(request.Status));
+            Assert.That(result.Priority, Is.EqualTo(request.Priority));
             _taskRepositoryMock.Verify(repo => repo.CreateAsync(It.Is<UserTask>(task => task.Title == request.Title && task.UserId == userId)), Times.Once);
         }
 
@@ -82,13 +91,15 @@ namespace BL.Tests.Services
             var taskId = Guid.NewGuid();
 
             _taskRepositoryMock.Setup(repo => repo.DeleteUserTaskAsync(userId, taskId))
-                               .ReturnsAsync(true);
+                               .ReturnsAsync(true)
+                               .Verifiable();
 
             // Act
             var result = await _taskService.DeleteUserTaskAsync(userId, taskId);
 
             // Assert
             Assert.That(result, Is.True);
+            _taskRepositoryMock.Verify(repo => repo.DeleteUserTaskAsync(userId, taskId), Times.Once);
         }
 
         [Test]

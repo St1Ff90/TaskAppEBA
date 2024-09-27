@@ -6,24 +6,15 @@ using BL.Services.UserService;
 namespace TaskAppEBA.Controllers
 {
     [Route("[controller]")]
-    public class UsersController : ControllerBase
+    public class UsersController(IUserService _userService, ILogger<UsersController> _logger) : ControllerBase
     {
-        private readonly IUserService _userService;
-        private readonly ILogger<UsersController> _logger;
-
-        public UsersController(IUserService userService, ILogger<UsersController> logger)
-        {
-            _userService = userService;
-            _logger = logger;
-        }
-
         /// <summary>
         /// Registers a new user with the specified <paramref name="registrationDto"/>.
-        /// Returns a 200 OK status if the registration is successful,
-        /// or a 400 Bad Request if the input data is invalid.
+        /// Returns a <see cref="System.Net.HttpStatusCode.OK"/> status if the registration is successful,
+        /// or a <see cref="System.Net.HttpStatusCode.BadRequest"/> if the input data is invalid.
         /// </summary>
         /// <param name="registrationDto">The request object containing user registration details.</param>
-        /// <returns>An IActionResult indicating the result of the operation.</returns>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync(RegistrationRequest registrationDto)
         {
@@ -40,11 +31,11 @@ namespace TaskAppEBA.Controllers
 
         /// <summary>
         /// Authenticates a user with the specified <paramref name="loginDto"/>.
-        /// Returns a 200 OK status with the authentication token if the login is successful,
-        /// or a 401 Unauthorized if the credentials are invalid.
+        /// Returns a <see cref="System.Net.HttpStatusCode.OK"/> status with the authentication token if the login is successful,
+        /// or a <see cref="System.Net.HttpStatusCode.Unauthorized"/> if the credentials are invalid.
         /// </summary>
         /// <param name="loginDto">The request object containing user login credentials.</param>
-        /// <returns>An IActionResult containing the authentication token or an error response.</returns>
+        /// <returns>An <see cref="IActionResult"/> containing the authentication token or an error response.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync(LoginDto loginDto)
         {

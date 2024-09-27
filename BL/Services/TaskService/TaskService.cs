@@ -1,5 +1,4 @@
 ﻿using BL.Mappers;
-using BL.Models;
 using BL.Models.DTO;
 using BL.Models.Filters;
 using BL.Models.Requests;
@@ -7,8 +6,6 @@ using DAL.Entities;
 using DAL.Repositories.TaskRepository.TaskRepository;
 using LinqKit;
 using Microsoft.Extensions.Logging;
-using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 
 namespace BL.Services.TaskService
