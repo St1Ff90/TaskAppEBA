@@ -19,7 +19,7 @@ services:
     depends_on:
       - sqlserver
     environment:
-      - ConnectionStrings__DefaultConnection=Server=dockercompose9436897743579848051-sqlserver-1;Database=TaskDb;User Id=sa;Password=Jyz8myMouse;Encrypt=False;Trust Server Certificate=True;
+      - ConnectionStrings__DefaultConnection=Server=dockercompose9436897743579848051-sqlserver-1;Database=TaskDb;User Id=sa;Password=********;Encrypt=False;Trust Server Certificate=True;
     command: >
       /bin/sh -c "dotnet ef database update --no-build && dotnet your_app.dll"
 
